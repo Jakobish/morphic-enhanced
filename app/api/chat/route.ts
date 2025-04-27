@@ -1,3 +1,4 @@
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createManualToolStreamResponse } from '@/lib/streaming/create-manual-tool-stream'
 import { createToolCallingStreamResponse } from '@/lib/streaming/create-tool-calling-stream'
 import { Model } from '@/lib/types/models'
@@ -42,6 +43,10 @@ export async function POST(req: Request) {
       }
     }
 
+    const geminiProModel = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '')
+      .getGenerativeModel({ model: 'gemini-pro' })
+    const history = messages
+
     if (
       !isProviderEnabled(selectedModel.providerId) ||
       selectedModel.enabled === false
@@ -55,21 +60,45 @@ export async function POST(req: Request) {
       )
     }
 
-    const supportsToolCalling = selectedModel.toolCallType === 'native'
-
-    return supportsToolCalling
-      ? createToolCallingStreamResponse({
+    if (selectedModel.providerId === 'google') {
+      const geminiResponse = await geminiProModel.generateContentStream({
+        contents: history,
+        stream: true
+      })
+      const responseStream = new ReadableStream({
+        async start(controller) {
+          for await (const chunk of geminiResponse.stream) {
+            const chunkText = chunk.text()
+            controller.enqueue(
+              `data: ${JSON.stringify({
+                text: chunkText
+              })}\n\n`
+            )
+          }
+          controller.close()
+        }
+      })
+      return new Response(responseStream, {
+        headers: {
+          'Content-Type': 'text/event-stream'
+        }
+      })
+    } else {
+      const supportsToolCalling = selectedModel.toolCallType === 'native'
+      return supportsToolCalling
+        ? createToolCallingStreamResponse({
+            messages,
+            model: selectedModel,
+            chatId,
+            searchMode
+          })
+        : createManualToolStreamResponse({
           messages,
           model: selectedModel,
           chatId,
           searchMode
         })
-      : createManualToolStreamResponse({
-          messages,
-          model: selectedModel,
-          chatId,
-          searchMode
-        })
+    }
   } catch (error) {
     console.error('API route error:', error)
     return new Response('Error processing your request', {

@@ -5,7 +5,7 @@ import { Model } from '@/lib/types/models'
 import { useChat } from '@ai-sdk/react'
 import { Message } from 'ai/react'
 import { useEffect } from 'react'
-import { toast } from 'sonner'
+import { Toaster, toast } from 'sonner'
 import { ChatMessages } from './chat-messages'
 import { ChatPanel } from './chat-panel'
 
@@ -61,6 +61,13 @@ export function Chat({
     })
   }
 
+  const handleSpeechTranscription = (text: string) => {
+    append({
+      role: 'user',
+      content: text,
+    })
+  }
+
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setData(undefined) // reset data to clear tool call
@@ -88,6 +95,7 @@ export function Chat({
         query={query}
         append={append}
         models={models}
+        handleSpeechTranscription={handleSpeechTranscription}
       />
     </div>
   )

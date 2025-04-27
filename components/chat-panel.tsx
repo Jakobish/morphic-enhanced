@@ -1,5 +1,7 @@
+
 'use client'
 
+import SpeechToTextInput from '@/components/speech-to-text-input'
 import { Model } from '@/lib/types/models'
 import { cn } from '@/lib/utils'
 import { Message } from 'ai'
@@ -36,7 +38,7 @@ export function ChatPanel({
   query,
   stop,
   append,
-  models
+  models,
 }: ChatPanelProps) {
   const [showEmptyScreen, setShowEmptyScreen] = useState(false)
   const router = useRouter()
@@ -86,6 +88,10 @@ export function ChatPanel({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query])
+
+    const handleSpeechTranscription = (text: string) => {
+        handleInputChange({ target: { value: text } } as React.ChangeEvent<HTMLTextAreaElement>);
+    };
 
   return (
     <div
@@ -154,6 +160,9 @@ export function ChatPanel({
             <div className="flex items-center gap-2">
               <ModelSelector models={models || []} />
               <SearchModeToggle />
+            </div>
+            <div>
+              <SpeechToTextInput onTranscription={handleSpeechTranscription}/>
             </div>
             <div className="flex items-center gap-2">
               {messages.length > 0 && (

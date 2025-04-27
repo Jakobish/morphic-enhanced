@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import type { Metadata, Viewport } from 'next'
 import { Inter as FontSans } from 'next/font/google'
 import './globals.css'
+import { SettingsPanel } from '@/components/settings-panel'
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -56,6 +57,7 @@ export default function RootLayout({
           <Header />
           {children}
           <Footer />
+          <SettingsPanel />
           <Toaster />
         </ThemeProvider>
       </body>
