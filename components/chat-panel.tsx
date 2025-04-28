@@ -8,7 +8,6 @@ import { Message } from 'ai'
 import { ArrowUp, MessageCirclePlus, Square } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import Textarea from 'react-textarea-autosize'
 import { EmptyScreen } from './empty-screen'
 import { ModelSelector } from './model-selector'
 import { SearchModeToggle } from './search-mode-toggle'
@@ -89,9 +88,9 @@ export function ChatPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query])
 
-    const handleSpeechTranscription = (text: string) => {
-        handleInputChange({ target: { value: text } } as React.ChangeEvent<HTMLTextAreaElement>);
-    };
+  const handleSpeechTranscription = (text: string) => {
+    handleInputChange({ target: { value: text } } as React.ChangeEvent<HTMLTextAreaElement>);
+  };
 
   return (
     <div
@@ -118,11 +117,10 @@ export function ChatPanel({
         )}
       >
         <div className="relative flex flex-col w-full gap-2 bg-muted rounded-3xl border border-input">
-          <Textarea
+          <textarea
             ref={inputRef}
             name="input"
             rows={2}
-            maxRows={5}
             tabIndex={0}
             onCompositionStart={handleCompositionStart}
             onCompositionEnd={handleCompositionEnd}
@@ -162,7 +160,7 @@ export function ChatPanel({
               <SearchModeToggle />
             </div>
             <div>
-              <SpeechToTextInput onTranscription={handleSpeechTranscription}/>
+              <SpeechToTextInput onTranscription={handleSpeechTranscription} />
             </div>
             <div className="flex items-center gap-2">
               {messages.length > 0 && (
